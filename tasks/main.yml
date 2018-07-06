@@ -31,7 +31,7 @@
 - include: create_ec2.yml
   when:
     - hostvars.localhost.found_managers is defined
-    - hostvars.localhost.found_workers is define
+    - hostvars.localhost.found_workers is defined
 
 - name: "Get EC2 facts"
   ec2_instance_facts:
