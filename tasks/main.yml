@@ -29,6 +29,9 @@
   register: found_managers
 
 - include: create_ec2.yml
+  when:
+    - hostvars.localhost.found_managers is defined
+    - hostvars.localhost.found_workers is define
 
 - name: "Get EC2 facts"
   ec2_instance_facts:
@@ -43,7 +46,7 @@
 
 - name: "Create the tag_Type_{{item.tags.Type}} host group"
   add_host: 
-    name: "{{ item.public_ip_address }}"
+    name: "{{ item.public_dns_name }}"
     groups:
       - "tag_Role_{{ ec2.tag_Role }}"
       - "swarm"
@@ -54,11 +57,3 @@
   with_items: "{{ found.instances }}"
   when: found.instances|length == "{{ ec2.count_worker+ec2.count_manager }}"|int
 
-- name: Wait for the instances to boot by checking the ssh port
-  wait_for: 
-    host: "{{item.public_ip_address}}" 
-    port: 22 
-    delay: 5 
-    timeout: 300
-    state: started
-  with_items: "{{ found.instances }}"
