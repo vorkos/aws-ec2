@@ -57,3 +57,12 @@
   with_items: "{{ found.instances }}"
   when: found.instances|length == "{{ ec2.count_worker+ec2.count_manager }}"|int
 
+- name: Wait for the instances to boot by checking the ssh port
+  wait_for:
+    host: "{{item.public_ip_address}}"
+    port: 22
+    delay: 2
+    timeout: 300
+    state: started
+  with_items: "{{ found.instances }}"
+
